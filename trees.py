@@ -1,11 +1,10 @@
-# trees.py
 import pandas as pd, numpy as np
 from graphviz import Digraph
 
 from infogain import ID3
 from gini import gini_tree
 
-# Function to convert tree to dot format
+# Convert tree dict to dot (graphviz) format
 def tree_to_dot(tree, parent_name='', graph=None, node_id=0):
     if graph is None:
         graph = Digraph(

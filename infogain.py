@@ -1,8 +1,7 @@
-# infogain.py
 import pandas as pd, numpy as np
 from graphviz import Digraph
 
-# Define entropy function
+# Entropy function
 def entropy(target_col):
     elements, counts = np.unique(target_col, return_counts=True)
     total_elements = np.sum(counts)
@@ -10,7 +9,7 @@ def entropy(target_col):
     total_entropy = np.sum(entropy_components)
     return total_entropy, elements, counts, entropy_components
 
-# Define a function to print entropy calculation details
+# Helper function to print entropy calculation details
 def print_entropy_details(elements, counts, entropy_components, depth=0):
     tree_block = "│" if depth > 0 else " "
     indent = f"{tree_block}  " * depth
@@ -25,7 +24,7 @@ def print_entropy_details(elements, counts, entropy_components, depth=0):
     total_entropy = np.sum(entropy_components)
     print(f"{indent}│  └─── {joined_details} = {entropy_values} = {total_entropy:.3f}")
 
-# Define information gain function
+# Information gain function
 def info_gain(data, split_attribute, target_attribute="Buys_Computer"):
     total_entropy, _, _, _ = entropy(data[target_attribute])
     vals, counts = np.unique(data[split_attribute], return_counts=True)
@@ -34,7 +33,7 @@ def info_gain(data, split_attribute, target_attribute="Buys_Computer"):
     information_gain = total_entropy - weighted_entropy
     return information_gain, total_entropy, weighted_entropy
 
-# Define ID3 algorithm with step-by-step print statements
+# ID3 algorithm
 def ID3(data, original_data, features, target_attribute="Buys_Computer", parent_node_class=None, depth=0):
     t = ID3_(data, original_data, features, target_attribute, parent_node_class, depth)
     print("│\n└──── Finished ID3 algorithm")
@@ -65,7 +64,6 @@ def ID3_(data, original_data, features, target_attribute="Buys_Computer", parent
     else:
         parent_node_class = np.unique(data[target_attribute])[np.argmax(np.unique(data[target_attribute], return_counts=True)[1])]
         parent_entropy, elements, counts, entropy_components = entropy(data[target_attribute])
-        # print(f"{indent}Parent node class: {parent_node_class}")
         block = "├" if depth > 0 else "┌"
         print(f"{indent}{block}──┬─ Parent class entropy: {parent_entropy:.3f}")
         print_entropy_details(elements, counts, entropy_components, depth)
@@ -79,7 +77,6 @@ def ID3_(data, original_data, features, target_attribute="Buys_Computer", parent
         count_features = len(info_gain_dict.keys())
         if count_features == 1:
             feature, gain = list(info_gain_dict.items())[0]
-            # print(f"{indent}├──── Only one feature remains: {feature}: {gini:.3f}")
             tree = {feature: {}}
         else:
             print(f"{indent}├──┬─ Calculating Information Gain for:")

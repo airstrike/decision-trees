@@ -1,8 +1,10 @@
-# gini.py
 import pandas as pd, numpy as np
 from itertools import combinations
 
-# Define Gini Index function
+def generate_indent_tree_blocks(depth, right):
+    return "".join(["│  " if not int(right[i]) else "   " for i in range(depth)])
+
+# Gini Index function
 def gini_index(target_col):
     elements, counts = np.unique(target_col, return_counts=True)
     total_elements = np.sum(counts)
@@ -10,17 +12,8 @@ def gini_index(target_col):
     gini = 1 - np.sum(gini_components)
     return gini, elements, counts, gini_components
 
-# Define a function to print Gini calculation details
+# Helper function to print Gini calculation details
 def print_gini_details(elements, counts, gini_components, depth=0, right=""):
-    # tree_block = "│" if depth > 0 else " "
-    # indent = f"{tree_block}  " * depth
-    # if depth > 0:
-    #     tree_block = "│"
-    #     indent = f"{tree_block}  " * (depth-1)
-    #     indent = indent + "│  " if not right else indent + "   "
-    # else:
-    #     tree_block = " "
-    #     indent = f"{tree_block}  " * depth
     indent = generate_indent_tree_blocks(depth, right)
     total_elements = np.sum(counts)
     details = []
@@ -31,7 +24,7 @@ def print_gini_details(elements, counts, gini_components, depth=0, right=""):
     total_gini = 1 - np.sum(gini_components)
     print(f"{indent}│  └─── {joined_details} = {gini_values} = {total_gini:.4f}")
 
-# Define the Gini split function for binary splits
+# Gini binary split function
 def gini_split(data, feature, target_attribute="Buys_Computer"):
     total_gini, _, _, _ = gini_index(data[target_attribute])
     vals = np.unique(data[feature])
@@ -41,6 +34,7 @@ def gini_split(data, feature, target_attribute="Buys_Computer"):
     split_details = []
 
     if data[feature].dtype.kind in 'iufc':  # For continuous attributes
+        print("--> WARNING: CONTINUOUS SPLITS HAVE NOT BEEN TESTED <---")
         vals = sorted(vals)
         for i in range(1, len(vals)):
             split_point = (vals[i-1] + vals[i]) / 2
@@ -76,24 +70,8 @@ def gini_split(data, feature, target_attribute="Buys_Computer"):
     
     return reduction_in_impurity, min_gini, best_split, split_details
 
-def generate_indent_tree_blocks(depth, right):
-    # consume a string of "right" markers as "01100101" etc with each
-    # 1 corresponding to a right branch and 0 to a left branch, with
-    # left branches having a "│  " prefix and right branches having a "   "
-    # prefix. " " for root node.
-    return "".join(["│  " if not int(right[i]) else "   " for i in range(depth)])
-
-# Update the print_split_details function to handle subsets of categories
+# Helper function to print split details
 def print_split_details(split_details, feature, depth=0, right=""):
-    # tree_block = "│" if depth > 0 else " "
-    # indent = f"{tree_block}  " * depth
-    # if depth > 0:
-    #     tree_block = "│"
-    #     indent = f"{tree_block}  " * (depth-1)
-    #     indent = indent + "│  " if not right else indent + "   "
-    # else:
-    #     tree_block = " "
-    #     indent = f"{tree_block}  " * depth
     indent = generate_indent_tree_blocks(depth, right)
     count_splits = len(split_details)
     for i, (split, gini) in enumerate(split_details):
@@ -114,15 +92,6 @@ def gini_tree(data, original_data, features, target_attribute="Buys_Computer", p
 
 # Define Gini-based decision tree algorithm
 def gini_tree_(data, original_data, features, target_attribute="Buys_Computer", parent_node_class=None, depth=0, right=""):
-    # Print the current depth of the tree
-    # indent = "  " + "  " * depth
-    # if depth > 0:
-    #     tree_block = "│"
-    #     indent = f"{tree_block}  " * (depth-1)
-    #     indent = indent + "│  " if not right else indent + "   "
-    # else:
-    #     tree_block = " "
-    #     indent = f"{tree_block}  " * depth
     indent = generate_indent_tree_blocks(depth, right)
     
     # If all target values are the same, return the single class
@@ -145,7 +114,6 @@ def gini_tree_(data, original_data, features, target_attribute="Buys_Computer", 
     else:
         parent_node_class = np.unique(data[target_attribute])[np.argmax(np.unique(data[target_attribute], return_counts=True)[1])]
         parent_gini, elements, counts, gini_components = gini_index(data[target_attribute])
-        # print(f"{indent}├──── Parent node class: {parent_node_class}")
         block = "├" if depth > 0 else "┌"
         root_or_parent = "Root" if depth == 0 else "Parent"
         print(f"{indent}{block}──┬─ {root_or_parent} class Gini:")
@@ -161,7 +129,6 @@ def gini_tree_(data, original_data, features, target_attribute="Buys_Computer", 
         count_features = len(gini_dict.keys())
         if count_features == 1:
             feature, gini = list(gini_dict.items())[0]
-            # print(f"{indent}├──── Only one feature remains: {feature}: {gini:.4f}")
             tree = {feature: {}}
         else:
             print(f"{indent}│")
@@ -195,7 +162,6 @@ def gini_tree_(data, original_data, features, target_attribute="Buys_Computer", 
         best_split, best_split_complement, D1, D2 = item_values[best_feature_index][2]
         best_split_str = best_split.replace("frozenset", "")
         best_split_complement_str = best_split_complement.replace("frozenset", "")
-        # category_name = best_split_str.split(" in {")[1][:-1]
         if len(features) > 0 and len(np.unique(D1[target_attribute])) > 1:
             print(f"{indent}│")
             print(f"{indent}├──┬─ Creating left subtree for {best_split_str}")
@@ -204,10 +170,8 @@ def gini_tree_(data, original_data, features, target_attribute="Buys_Computer", 
         else:
             print(f"{indent}├──── {best_split_str} only has one value for '{target_attribute}': '{np.unique(D1[target_attribute])[0]}'")
             subtree_left = np.unique(D1[target_attribute])[0]
-            # subtree_left = gini_tree_(D1, original_data, features, target_attribute, parent_node_class, depth + 1)
             tree[best_feature][best_split_str] = subtree_left
         
-        # complement_category_name = best_split_complement_str.split(" in {")[1][:-1]
         if len(features) > 0 and len(np.unique(D2[target_attribute])) > 1:
             print(f"{indent}│")
             print(f"{indent}└──┬─ Creating right subtree for {best_split_complement_str}")
@@ -216,7 +180,6 @@ def gini_tree_(data, original_data, features, target_attribute="Buys_Computer", 
         else:
             print(f"{indent}└──── {best_split_complement_str} only has one value for '{target_attribute}': '{np.unique(D2[target_attribute])[0]}'")
             subtree_right = np.unique(D2[target_attribute])[0]
-            # subtree_right = gini_tree_(D2, original_data, features, target_attribute, parent_node_class, depth + 1)
             tree[best_feature][best_split_complement_str] = subtree_right
         
         return tree
