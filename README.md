@@ -42,6 +42,17 @@ files, and print the classification rules.
   using Information Gain.
 - `buys_computer.csv`: The dataset used for building the decision trees.
 
+The output trees are saved as SVG files:
+
+- `id3_tree.svg`: The decision tree generated using the ID3 algorithm:
+  ![ID3 Tree](id3_tree.svg)
+
+- `gini_tree.svg`: The decision tree generated using the Gini Index algorithm:
+  ![Gini Tree](gini_tree.svg)
+
+- Classification rules are printed to the console for both algorithms.
+
+
 ## Requirements
 
 The following Python packages are required to run the scripts:
@@ -93,13 +104,6 @@ are as follows:
 
 The resulting tree and classification rules are saved as `gini_tree.svg` and
 printed to the console, respectively.
-
-## Output
-
-- `id3_tree.svg`: The decision tree generated using the ID3 algorithm
-  (Information Gain).
-- `gini_tree.svg`: The decision tree generated using the Gini Index algorithm.
-- Classification rules are printed to the console for both algorithms.
 
 ## Example Dataset
 
