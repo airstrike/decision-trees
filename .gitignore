@@ -1,0 +1,5 @@
+*.pdf
+*.typ
+*.docx
+__pycache__*
+trash
