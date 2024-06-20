@@ -33,6 +33,24 @@ def info_gain(data, split_attribute, target_attribute="Buys_Computer"):
     information_gain = total_entropy - weighted_entropy
     return information_gain, total_entropy, weighted_entropy
 
+# Helper function to print information gain details showing the math for the
+# specific attribute (not the net result)
+def print_info_gain_details(data, split_attribute, target_attribute, depth=0, last=False):
+    tree_block = "│" if depth > 0 else " "
+    indent = f"{tree_block}  " * depth
+    total_entropy, _, _, _ = entropy(data[target_attribute])
+    vals, counts = np.unique(data[split_attribute], return_counts=True)
+    details = []
+    for i in range(len(vals)):
+        entropy_val = entropy(data[data[split_attribute] == vals[i]][target_attribute])[0]
+        proportion = counts[i] / np.sum(counts)
+        details.append(f"{proportion:.3f} * {entropy_val:.3f}")
+    joined_details = " + ".join(details)
+    weighted_entropy = np.sum([(counts[i]/np.sum(counts)) * entropy(data[data[split_attribute] == vals[i]][target_attribute])[0] for i in range(len(vals))])
+    block = "├" if not last else "└"
+    print(f"{indent}│  {block}─── {split_attribute:16}: {joined_details} = {weighted_entropy:.3f}")
+
+
 # ID3 algorithm
 def ID3(data, original_data, features, target_attribute="Buys_Computer", parent_node_class=None, depth=0):
     t = ID3_(data, original_data, features, target_attribute, parent_node_class, depth)
@@ -69,6 +87,16 @@ def ID3_(data, original_data, features, target_attribute="Buys_Computer", parent
         print_entropy_details(elements, counts, entropy_components, depth)
         
         item_values = [info_gain(data, feature, target_attribute) for feature in features]
+        print(f"{indent}│")
+        print(f"{indent}├──┬─ Calculating entropy for features:")
+        for e, feature in enumerate(features):
+            if e == len(features) - 1:
+                block = "└"
+                last = True
+            else:
+                block = "├"
+                last = False
+            print_info_gain_details(data, feature, target_attribute, depth, last)
         info_gains = [item[0] for item in item_values]
         info_gain_dict = dict(zip(features, info_gains))
         best_feature_index = np.argmax(info_gains)
