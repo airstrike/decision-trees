@@ -67,6 +67,14 @@ You can install the required packages using the following command:
 pip install pandas numpy graphviz
 ```
 
+For convenience, a `requirements.txt` file is provided with the versions of
+these packages used during development. You can install these versions using the
+following command:
+
+```bash
+pip install -r requirements.txt
+```
+
 Additionally, you need to have Graphviz installed on your system. You can
 download it from [Graphviz's official website](https://graphviz.org/download/)
 and follow the installation instructions for your operating system.
