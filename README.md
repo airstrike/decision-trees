@@ -12,11 +12,11 @@ classification rules from them.
 
 ```bash
 # Using Git
-git clone https://github.com/foo/trees.git
+git clone https://github.com/airstrike/trees.git
 cd trees
 
 # Using curl
-curl -LO https://github.com/foo/trees/archive/refs/heads/main.zip
+curl -LO https://github.com/airstrike/trees/archive/refs/heads/main.zip
 unzip main.zip
 cd trees-main
 ```
