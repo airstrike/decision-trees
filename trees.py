@@ -1,11 +1,12 @@
-import pandas as pd, numpy as np
+import pandas as pd
+import numpy as np
 from graphviz import Digraph
-
 from infogain import ID3
 from gini import gini_tree
+import argparse
 
 # Convert tree dict to dot (graphviz) format
-def tree_to_dot(tree, parent_name='', graph=None, node_id=0):
+def tree_to_dot(tree, target_var, parent_name='', graph=None, node_id=0):
     if graph is None:
         graph = Digraph(
             graph_attr={
@@ -16,19 +17,19 @@ def tree_to_dot(tree, parent_name='', graph=None, node_id=0):
             node_attr={'fontname': 'Helvetica'},
             edge_attr={'fontname': 'Helvetica'}
         )
-        graph.node( name=str(node_id), label=str(list(tree.keys())[0]))
+        graph.node(name=str(node_id), label=str(list(tree.keys())[0]))
         root_id = node_id
         node_id += 1
     else:
         root_id = parent_name
-
+        
     for value, subtree in tree[list(tree.keys())[0]].items():
         if isinstance(subtree, dict):
             graph.node(name=str(node_id), label=str(list(subtree.keys())[0]))
             if "{" in str(value):
                 value = value.split("{")[1].split("}")[0]
             graph.edge(str(root_id), str(node_id), label=str(value))
-            graph, node_id = tree_to_dot(subtree, parent_name=node_id, graph=graph, node_id=node_id+1)
+            graph, node_id = tree_to_dot(subtree, target_var, parent_name=node_id, graph=graph, node_id=node_id+1)
         else:
             color = 'palegreen' if str(subtree) == 'Yes' else 'lightcoral'
             graph.node(name=str(node_id), label=str(subtree), shape='box',
@@ -37,63 +38,78 @@ def tree_to_dot(tree, parent_name='', graph=None, node_id=0):
                 value = value.split("{")[1].split("}")[0]
             graph.edge(str(root_id), str(node_id), xlabel=str(value))
             node_id += 1
-
     return graph, node_id
 
 # Function to extract classification rules
-def extract_rules(tree, parent_name='', current_rule=''):
+def extract_rules(tree, target_var, parent_name='', current_rule=''):
     rules = []
     root = list(tree.keys())[0]
     
     for value, subtree in tree[root].items():
         if isinstance(subtree, dict):
-            rules += extract_rules(subtree, root, f"{current_rule} AND {root}={value}" if current_rule else f"{root}={value}")
+            rules += extract_rules(subtree, target_var, root, f"{current_rule} AND {root}={value}" if current_rule else f"{root}={value}")
         else:
             rule = f"{current_rule} AND {root}='{value}'" if current_rule else f"{root}='{value}'"
-            rule = f"IF {rule} THEN Buys_Computer='{subtree}'"
+            rule = f"IF {rule} THEN {target_var}='{subtree}'"
             rules.append(rule)
     
     return rules
-
-
-df = pd.read_csv('buys_computer.csv')
 
 def boxprint(text):
     print("┌" + "─" * (len(text) + 2) + "┐")
     print("│ " + text + " │")
     print("└" + "─" * (len(text) + 2) + "┘")
 
-def run_id3():
+def run_id3(df, target_var):
     # Run ID3 algorithm using Information Gain
-    boxprint("Decision tree using Information Gain (ID3)")
-    entropy_tree = ID3(df, df, df.columns[:-1])
+    boxprint(f"Decision tree using Information Gain (ID3) for {target_var}")
+    feature_columns = [col for col in df.columns if col != target_var]
+    entropy_tree = ID3(df, df, feature_columns, target_var)
     print(entropy_tree)
-
-    graph, _ = tree_to_dot(entropy_tree)
+    graph, _ = tree_to_dot(entropy_tree, target_var)
     graph.render('id3_tree', format='svg', cleanup=True)
     boxprint("ID3 tree saved as 'id3_tree.svg'.")
-
-    rules = extract_rules(entropy_tree)
-    boxprint("Classification rules using Information Gain:")
+    rules = extract_rules(entropy_tree, target_var)
+    boxprint(f"Classification rules using Information Gain for {target_var}:")
     for rule in rules:
         print("  " + rule)
 
-
-def run_gini():
+def run_gini(df, target_var):
     # Run Gini-based decision tree algorithm
-    boxprint("Decision tree using Gini Index (binary splits)")
-    gt = gini_tree(df, df, df.columns[:-1])
+    boxprint(f"Decision tree using Gini Index (binary splits) for {target_var}")
+    feature_columns = [col for col in df.columns if col != target_var]
+    gt = gini_tree(df, df, feature_columns, target_var)
     print(gt)
-
-    graph, _ = tree_to_dot(gt)
+    graph, _ = tree_to_dot(gt, target_var)
     graph.render('gini_tree', format='svg', cleanup=True)
     boxprint("Gini tree saved as 'gini_tree.svg'.")
-
-    rules = extract_rules(gt)
-    boxprint("Classification rules using Gini Index:")
+    rules = extract_rules(gt, target_var)
+    boxprint(f"Classification rules using Gini Index for {target_var}:")
     for rule in rules:
         print("  " + rule)
 
+def main():
+    parser = argparse.ArgumentParser(description='Generate decision trees with a specified target variable')
+    parser.add_argument('target_variable', type=str, help='The target variable to predict')
+    parser.add_argument('input', type=str, help='Input CSV file path')
+    args = parser.parse_args()
+    
+    # Read the data
+    try:
+        df = pd.read_csv(args.input)
+    except FileNotFoundError:
+        print(f"Error: Could not find input file '{args.input}'")
+        return
+        
+    # Verify target variable exists in dataset
+    if args.target_variable not in df.columns:
+        print(f"Error: Target variable '{args.target_variable}' not found in dataset")
+        print(f"Available columns: {', '.join(df.columns)}")
+        return
+    
+    # Run both algorithms
+    run_id3(df, args.target_variable)
+    run_gini(df, args.target_variable)
+
 if __name__ == "__main__":
-    run_id3()
-    run_gini()
+    main()

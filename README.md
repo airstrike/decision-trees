@@ -1,136 +1,84 @@
+# decision-trees 🌳
 
-# Decision Tree Algorithms
+A flexible implementation of ID3 and Gini decision tree algorithms with visualization capabilities.
 
-This repository contains implementations of decision tree algorithms using two
-different criteria for splitting: Information Gain (ID3) and Gini Index. The
-provided scripts allow you to visualize the decision trees and extract
-classification rules from them.
+## Overview
 
-## Usage
+`decision-trees` provides an intuitive interface for building and visualizing decision trees using both information gain (ID3) and Gini impurity splitting criteria. It generates comprehensive decision rules and creates visual representations of the resulting trees.
 
-1. Clone the repository or download the script:
+Key features:
+- Support for both ID3 and Gini-based decision trees
+- Automatic rule extraction from trained trees
+- SVG visualization generation
+- Dynamic target variable selection
+- Clean command-line interface
+- Flexible input data handling
 
-```bash
-# Using Git
-git clone https://github.com/airstrike/trees.git
-cd trees
+## Installation
 
-# Using curl
-curl -LO https://github.com/airstrike/trees/archive/refs/heads/main.zip
-unzip main.zip
-cd trees-main
-```
-
-2. Ensure you have the required packages installed (see Requirements section).
-
-3. Run the script:
+Clone the repository and install the required dependencies:
 
 ```bash
-python trees.py
-```
-
-This will execute the script, generate the decision trees, save them as SVG
-files, and print the classification rules.
-
-## Files
-
-- `trees.py`: The main script to run the decision tree algorithms and visualize
-  the results.
-- `gini.py`: Contains the implementation of the Gini Index-based decision tree
-  algorithm.
-- `infogain.py`: Contains the implementation of the ID3 decision tree algorithm
-  using Information Gain.
-- `buys_computer.csv`: The dataset used for building the decision trees.
-
-The output trees are saved as SVG files:
-
-- `id3_tree.svg`: The decision tree generated using the ID3 algorithm:
-  ![ID3 Tree](id3_tree.svg)
-
-- `gini_tree.svg`: The decision tree generated using the Gini Index algorithm:
-  ![Gini Tree](gini_tree.svg)
-
-- Classification rules are printed to the console for both algorithms.
-
-
-## Requirements
-
-The following Python packages are required to run the scripts:
-
-- pandas
-- numpy
-- graphviz
-
-You can install the required packages using the following command:
-
-```bash
-pip install pandas numpy graphviz
-```
-
-For convenience, a `requirements.txt` file is provided with the versions of
-these packages used during development. You can install these versions using the
-following command:
-
-```bash
+git clone https://github.com/airstrike/decision-trees.git
+cd decision-trees
 pip install -r requirements.txt
 ```
 
-Additionally, you need to have Graphviz installed on your system. You can
-download it from [Graphviz's official website](https://graphviz.org/download/)
-and follow the installation instructions for your operating system.
+## Quick Start
 
-## Algorithms
+The script accepts two required arguments:
+- Target variable to predict
+- Input CSV file path
 
-### ID3 Algorithm (Information Gain)
+```bash
+python trees.py Buys_Computer data.csv
+```
 
-The ID3 algorithm builds a decision tree by recursively selecting the attribute
-that provides the highest information gain. Information Gain is calculated based
-on the entropy of the target attribute. The steps are as follows:
-
-1. Calculate the entropy of the target attribute.
-2. For each attribute, calculate the entropy and the information gain.
-3. Select the attribute with the highest information gain.
-4. Split the dataset based on the selected attribute and repeat the process for
-   each subset until all instances belong to the same class or there are no more
-   attributes to split on.
-
-The resulting tree and classification rules are saved as `id3_tree.svg` and
-printed to the console, respectively.
-
-### Gini Index Algorithm
-
-The Gini Index algorithm builds a decision tree by recursively selecting the
-attribute that results in the lowest Gini impurity for binary splits. The steps
-are as follows:
-
-1. Calculate the Gini impurity of the target attribute.
-2. For each attribute, calculate the Gini impurity for all possible binary splits.
-3. Select the attribute and split that results in the lowest Gini impurity.
-4. Split the dataset based on the selected attribute and repeat the process for
-   each subset until all instances belong to the same class or there are no more
-   attributes to split on.
-
-The resulting tree and classification rules are saved as `gini_tree.svg` and
-printed to the console, respectively.
+This will:
+1. Generate both ID3 and Gini-based decision trees
+2. Create SVG visualizations of the trees
+3. Extract and display classification rules
+4. Save visualizations as 'id3_tree.svg' and 'gini_tree.svg'
 
 ## Example Dataset
 
-The example dataset `buys_computer.csv` is used to build the decision trees. The
-dataset contains the following columns:
+The repository includes `buys_computer.csv` as a sample dataset. This dataset contains customer attributes and their computer purchasing decisions, making it perfect for demonstrating binary classification trees.
 
-- Age
-- Income
-- Student
-- Credit_Rating
-- Buys_Computer
+Example usage with the provided dataset:
 
-Each row represents an instance with attributes and the target class
-`Buys_Computer`, indicating whether a computer was purchased (Yes or No).
+```bash
+python trees.py Buys_Computer buys_computer.csv
+```
 
-Feel free to modify the dataset or use your own to see how the decision trees
-and classification rules change.
+## Project Structure
 
----
+```
+decision-trees/
+├── trees.py        # Main implementation
+├── infogain.py     # ID3 algorithm implementation
+├── gini.py         # Gini index implementation
+└── buys_computer.csv  # Sample dataset
+```
 
-Enjoy exploring decision tree algorithms! If you have any questions or
-suggestions, feel free to open an issue or submit a pull request.
+## Development
+
+Running the code:
+```bash
+python trees.py <target_variable> <input_csv>
+```
+
+## Dependencies
+
+Built with:
+- pandas - Data manipulation
+- numpy - Numerical operations
+- graphviz - Tree visualization
+- argparse - Command-line interface
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

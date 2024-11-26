@@ -25,7 +25,7 @@ def print_entropy_details(elements, counts, entropy_components, depth=0):
     print(f"{indent}│  └─── {joined_details} = {entropy_values} = {total_entropy:.3f}")
 
 # Information gain function
-def info_gain(data, split_attribute, target_attribute="Buys_Computer"):
+def info_gain(data, split_attribute, target_attribute):
     total_entropy, _, _, _ = entropy(data[target_attribute])
     vals, counts = np.unique(data[split_attribute], return_counts=True)
     
@@ -52,12 +52,12 @@ def print_info_gain_details(data, split_attribute, target_attribute, depth=0, la
 
 
 # ID3 algorithm
-def ID3(data, original_data, features, target_attribute="Buys_Computer", parent_node_class=None, depth=0):
+def ID3(data, original_data, features, target_attribute, parent_node_class=None, depth=0):
     t = ID3_(data, original_data, features, target_attribute, parent_node_class, depth)
     print("│\n└──── Finished ID3 algorithm")
     return t
 
-def ID3_(data, original_data, features, target_attribute="Buys_Computer", parent_node_class=None, depth=0):
+def ID3_(data, original_data, features, target_attribute, parent_node_class=None, depth=0):
     # Print the current depth of the tree
     tree_block = "│" if depth > 0 else " "
     indent = f"{tree_block}  " * depth

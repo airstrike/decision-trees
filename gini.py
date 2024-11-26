@@ -24,7 +24,7 @@ def print_gini_details(elements, counts, gini_components):
     return f"{joined_details} = {gini_values} = {total_gini:0.4f}"
 
 # Gini binary split function
-def gini_split(data, feature, target_attribute="Buys_Computer", depth=0, right=""):
+def gini_split(data, feature, target_attribute, depth=0, right=""):
     total_gini, _, _, _ = gini_index(data[target_attribute])
     vals = np.unique(data[feature])
     
@@ -89,7 +89,7 @@ def print_split_details(split_details, feature, depth=0, right=""):
         else:
             print(f"{indent}│  {block} {split_str}: {gini:0.4f}")
 
-def find_best_split(data, features, target_attribute="Buys_Computer", depth=0, right=""):
+def find_best_split(data, features, target_attribute, depth=0, right=""):
     indent = generate_indent_tree_blocks(depth, right)
     total_gini, elements, counts, gini_components = gini_index(data[target_attribute])
     
@@ -116,13 +116,13 @@ def find_best_split(data, features, target_attribute="Buys_Computer", depth=0, r
     
     return best_feature, best_split
 
-def gini_tree(data, original_data, features, target_attribute="Buys_Computer", parent_node_class=None):
+def gini_tree(data, original_data, features, target_attribute, parent_node_class=None):
     gt = gini_tree_(data, original_data, features, target_attribute, parent_node_class)
     print("\nFinished Gini tree algorithm")
     return gt
 
 # Define Gini-based decision tree algorithm
-def gini_tree_(data, original_data, features, target_attribute="Buys_Computer", parent_node_class=None, depth=0, right=""):
+def gini_tree_(data, original_data, features, target_attribute, parent_node_class=None, depth=0, right=""):
     indent = generate_indent_tree_blocks(depth, right)
     
     # If all target values are the same, return the single class
